@@ -17,18 +17,21 @@ app.use(express.static("./static"));
 
 app.use('/todos', todosRouters);
 app.use('/users', userRouters);
-app.use('/:id', userRouters)
+app.use('/:id', userRouters);
+
+
 //Database Conniection
+async function dbconnection(){
+    try{
+     await mongoose.connect(process.env.URL);
+        console.log("DB is connected");
+        
+    }catch (error){
+        console.log(error);
+    }
+}
 
-mongoose
-.connect('mongodb://127.0.0.1:27017/todoDB')
-.then(() => {
-    console.log("Database Sucessfully");
-
-}).catch((err) => {
-    console.log("Database Faild");
-
-})
+dbconnection();
 
 app.get('/app', (req, res, next)=>{
     res.status(200).send("Hello World");
