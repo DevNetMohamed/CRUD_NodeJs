@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {SaveUsers, GetAll, GetById} = require('../controler/users');
+const {SaveUsers, GetAll, GetById, UserLogin} = require('../controler/users');
 
 router.post('/', SaveUsers)
+router.post('/login', UserLogin)
 router.get('/', GetAll)
 router.get('/', GetById)
+
+
 module.exports = router;
