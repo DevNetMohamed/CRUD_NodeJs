@@ -19,8 +19,18 @@ app.use('/todos', todosRouters);
 app.use('/users', userRouters);
 app.use('/:id', userRouters);
 
+// to Valit if user route any think in URL
+app.use((req, res)=>{
+    res.status(404).json({
+        status: "fail",
+        message: `Can not find ${req.originalUrl} on this server`
+    })
 
+});
 
+app.set('view engine', 'pug');
+
+app.set('views', './views');
 //Database Conniection
 async function dbconnection(){
     try{
