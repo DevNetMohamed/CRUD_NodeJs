@@ -1,14 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const {SaveUsers, GetAll, GetById, UserLogin} = require('../controler/users');
-const { auth } = require('../middlewares/auth');
-
+const { SaveUsers, GetAll, GetById, UserLogin } = require("../controler/users");
+const { auth, restrictTO } = require("../middlewares/auth");
 
 // router.use(auth)
-router.post('/', SaveUsers)
-router.post('/login', UserLogin)
-router.get('/', GetAll)
-router.get('/', GetById)
-
+router.post("/", auth, restrictTO("admin"), SaveUsers); // admin
+router.post("/login",auth, UserLogin);
+router.get("/", auth, restrictTO("admin", "user"), GetAll); //admin or User
+router.get("/", auth, restrictTO("admin", "user"), GetById); //admin or User
 
 module.exports = router;

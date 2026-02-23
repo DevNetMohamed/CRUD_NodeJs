@@ -2,62 +2,40 @@ const TodoModel = require("../models/todos");
 const UserModel = require("../models/Users");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { catchAsync } = require("../utils/CatchAsync");
 
-const SaveUsers = async (req, res, next) => {
+const SaveUsers = catchAsync(async (req, res, next) => {
   let SaveNewUser = req.body;
-  try {
-    const user = await UserModel.create(SaveNewUser);
 
-    res.status(201).json({
-      status: "sccessfully",
-      message: "saved successfully",
-      data: user,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "Fial",
-      mass: err.message,
-    });
-  }
-};
+  const user = await UserModel.create(SaveNewUser);
 
-const GetAll = async (req, res, next) => {
-  try {
-    const AllUser = await UserModel.find().populate("userID");
+  res.status(201).json({
+    status: "sccessfully",
+    message: "saved successfully",
+    data: user,
+  });
+});
+
+const GetAll = catchAsync(async (req, res, next) => {
+  const AllUser = await UserModel.find().populate("userID");
+  res.status(200).json({
+    status: "Success",
+    data: AllUser,
+  });
+});
+
+const GetById = catchAsync(async (req, res) => {
+  const { id } = req.param;
+  const todo = await UserModel.find({ _id: id });
+  if (todo) {
     res.status(200).json({
       status: "Success",
-      data: AllUser,
+      data: todo,
     });
-  } catch (error) {
-    res.status(500).json({
-      status: "Fial",
-      mass: error.message,
-    });
+  } else {
+    next(new AppErorr(404, "todo Not Found"));
   }
-};
-
-const GetById = async (req, res) => {
-  const { id } = req.param;
-  try {
-    const todo = await UserModel.find({ _id: id });
-    if (todo) {
-      res.status(200).json({
-        status: "Success",
-        data: todo,
-      });
-    } else {
-      res.status(400).json({
-        status: "faild",
-        massage: "todo not found",
-      });
-    }
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      massage: err.massage,
-    });
-  }
-};
+});
 
 const UserLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -84,12 +62,16 @@ const UserLogin = async (req, res) => {
   }
 
   // generate Token
-  const token = jwt.sign({ user:user._id, email: user.email }, process.env.SECRET,{
-    expiresIn: "1h",
-  });
+  const token = jwt.sign(
+    { user: user._id, email: user.email, role: user.role },
+    process.env.SECRET,
+    {
+      expiresIn: "1h",
+    },
+  );
   res.status(200).json({
     status: "Sccess",
-    token
+    token,
   });
 };
 

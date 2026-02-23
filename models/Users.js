@@ -27,6 +27,11 @@ const usersSchema = new mongoose.Schema({
         },
         message: props => `${props.value} the password must be char Abc123@#`
     }
+  },
+  role:{
+    type: String,
+    enum:["admin", "user"],
+    default: "user"
   }
 });
 
@@ -35,7 +40,6 @@ usersSchema.pre("save", async function(next){
 const salt =  await bcrypt.genSalt(10);
 const hashedpassword = await bcrypt.hash(this.password,salt);
 this.password = hashedpassword
-
   // next();
 });
 const userModel =  mongoose.model("User", usersSchema);
